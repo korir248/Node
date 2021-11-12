@@ -1,4 +1,5 @@
 require('dotenv').config()
+const mssql = require('mssql')
 
 const config = {
   user: process.env.DB_USER,
@@ -12,9 +13,23 @@ const config = {
   },
   options: {
     encrypt: true,
-    trustServerCertificate: false 
+    trustServerCertificate: true 
   }
 }
+
+mssql.connect(config).then(pool =>{
+
+  if(pool.connecting){
+      console.log('connecting to the database')
+  }
+
+  if(pool.connected){
+      
+      console.log("Connected")
+  }
+}).catch(e=>{
+    console.log(e.message)
+  })
 
 
 
