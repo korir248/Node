@@ -4,8 +4,8 @@ const config = require('../config/db.config')
 const getUsers = async()=> {
      try {
         let pool= await mssql.connect(config)
-        let sql = 'select id, username, email,isDeleted from users where isDeleted = 0';
-        let users = await pool.request().query(sql)
+        // let sql = 'select id, username, email,isDeleted from users where isDeleted = 0';
+        let users = await pool.request().execute('getUsers')
         console.log(users.recordset.length)
 
         const u =users.recordset.map(user=>{
@@ -26,8 +26,8 @@ const getUsers = async()=> {
  const getSpecificUser = async(id)=> {
     try {
        let pool= await mssql.connect(config)
-       let sql = `select id, username, email from users where isDeleted = 0 and id =${id}`;
-       let users = await pool.request().query(sql)
+    //    let sql = `select id, username, email from users where isDeleted = 0 and id =${id}`;
+       let users = await pool.request().execute(`getSpecificUser(${id})`)
        if(users.recordset.length === 0){
            return `No user with id ${id} was found!`
        }
@@ -47,25 +47,8 @@ const getUsers = async()=> {
 const deleteUser = async(id)=>{
     try {
         let pool = await mssql.connect(config)
-        let sql = `update users set isDeleted = 1 where id = ${id}`
-        let result = await pool.request().query(sql,(err,result)=>{
-            if (err) {
-                console.log(err.message);
-                return err.message              
-            }else{
-                
-            }
-        })
-    } catch (error) {
-        console.log(error.message);        
-    }
-}
-
-const updateUser = async(id,username)=>{
-    try {
-        let pool = await mssql.connect(config)
-        let sql = `update users set username = ${username} where id = ${id}`
-        let result = await pool.request().query(sql,(err,result)=>{
+        // let sql = `update users set isDeleted = 1 where id = ${id}`
+        let result = await pool.request().execute('deleteUser',(err,result)=>{
             if (err) {
                 console.log(err.message);
                 return err.message              
@@ -73,6 +56,26 @@ const updateUser = async(id,username)=>{
                 return result                
             }
         })
+        return result
+    } catch (error) {
+        console.log(error.message);        
+    }
+}
+
+const updateUser = async(id,username)=>{
+    try {        
+        let pool = await mssql.connect(config)
+        // let sql = `update users set username = ${username} where id = ${id}`
+        let result = await pool.request().execute('updateUser',(err,result)=>{
+            if (err) {
+                console.log(err.message);
+                return err.message              
+            }else{
+                return result                
+            }
+        })
+
+        return result
     } catch (error) {
         console.log(error.message);        
     }
@@ -82,8 +85,8 @@ const updateUser = async(id,username)=>{
 const addUser = async(username,email,password)=>{
     try {
         let pool = await mssql.connect(config)
-        let sql = `insert into users(username,email,password) values(${username},${email},${password})`
-        let result = await pool.request().query(sql,(err,result)=>{
+        // let sql = `insert into users(username,email,password) values(${username},${email},${password})`
+        let result = await pool.request().execute('addUser',(err,result)=>{
             if (err) {
                 console.log(err.message);
                 return err.message         
