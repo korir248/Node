@@ -70,7 +70,7 @@ const updateUser = async(id,username)=>{
                 console.log(err.message);
                 return err.message              
             }else{
-                
+                return result                
             }
         })
     } catch (error) {
@@ -80,12 +80,21 @@ const updateUser = async(id,username)=>{
 }
 
 const addUser = async(username,email,password)=>{
-try {
-    let pool = await mssql.connect(config)
-let sql = `insert into users(username,email,password) values(${username},${email},${password})`
-    
-} catch (err) {
-console.log(err.message);
+    try {
+        let pool = await mssql.connect(config)
+        let sql = `insert into users(username,email,password) values(${username},${email},${password})`
+        let result = await pool.request().query(sql,(err,result)=>{
+            if (err) {
+                console.log(err.message);
+                return err.message         
+            } else {
+                return result
+                
+            }
+        })
+        
+    } catch (err) {
+        console.log(err.message);
+    }
 }
-}
- module.exports = {getUsers, getSpecificUser,deleteUser,updateUser}
+ module.exports = {getUsers, getSpecificUser,deleteUser,updateUser,addUser}
