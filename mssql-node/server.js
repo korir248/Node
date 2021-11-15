@@ -10,6 +10,7 @@ const app = express()
 app.use(express.json())
 
 
+
 app.get("/",(req,res)=>{
     res.status(200).send("Welcome Home")
     console.log('welcome home');
@@ -20,7 +21,9 @@ app.get("/users",(req,res)=>{
         getUsers().then(result=>{
             res.json(result)
             console.log(result);
-        })        
+        }).catch(err=>{
+            console.log(err.message);
+        })       
     } catch (err) {
         console.log(err.message);
         
@@ -28,7 +31,9 @@ app.get("/users",(req,res)=>{
 })
 
 app.get("/users/:id",(req,res)=>{
-    const id =req.params.id
+    const id = parseInt(req.params.id)
+
+
     try {
         getSpecificUser(id).then(result=>{
             if(result[0] === null){
@@ -87,7 +92,6 @@ try {
 console.log(err.message);
 }
 })
-
 
 
 app.listen(PORT,()=>{
