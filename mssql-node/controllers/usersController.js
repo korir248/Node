@@ -27,7 +27,7 @@ const getUsers = async()=> {
     try {
        let pool= await mssql.connect(config)
     //    let sql = `select id, username, email from users where isDeleted = 0 and id =${id}`;
-       let users = await pool.request().execute(`getSpecificUser(${id})`)
+       let users = await pool.request().input("id",id).execute('getSpecificUser')
        if(users.recordset.length === 0){
            return `No user with id ${id} was found!`
        }
@@ -48,11 +48,12 @@ const deleteUser = async(id)=>{
     try {
         let pool = await mssql.connect(config)
         // let sql = `update users set isDeleted = 1 where id = ${id}`
-        let result = await pool.request().execute('deleteUser',(err,result)=>{
+        let result = await pool.request().input("id",id).execute('deleteUser',(err,result)=>{
             if (err) {
                 console.log(err.message);
                 return err.message              
             }else{
+                console.log("Deleted!");
                 return result                
             }
         })
@@ -63,14 +64,17 @@ const deleteUser = async(id)=>{
 }
 
 const updateUser = async(id,username)=>{
+
+    parseInt(id)
     try {        
         let pool = await mssql.connect(config)
         // let sql = `update users set username = ${username} where id = ${id}`
-        let result = await pool.request().execute('updateUser',(err,result)=>{
+        let result = await pool.request().input("id",id).input("username",username).execute('updateUser',(err,result)=>{
             if (err) {
                 console.log(err.message);
                 return err.message              
             }else{
+                console.log("Username updated");
                 return result                
             }
         })
@@ -86,7 +90,7 @@ const addUser = async(username,email,password)=>{
     try {
         let pool = await mssql.connect(config)
         // let sql = `insert into users(username,email,password) values(${username},${email},${password})`
-        let result = await pool.request().execute('addUser',(err,result)=>{
+        let result = await pool.request().input("username",username).input("email",email).input("password",password).execute('addUser',(err,result)=>{
             if (err) {
                 console.log(err.message);
                 return err.message         
@@ -95,6 +99,8 @@ const addUser = async(username,email,password)=>{
                 
             }
         })
+
+        console.log(result);
         
     } catch (err) {
         console.log(err.message);
